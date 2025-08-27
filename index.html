@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="/images/free-icon-trident-7506873.png" type="image/x-icon">
+    <title>Weather App</title>
+</head>
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" placeholder="Search for a city" spellcheck="false">
+            <button><img src="./images/search.png" alt=""></button>
+        </div>
+        <div class="weather">
+            <img src="./images/rain.png" class="weather-icon" alt="">
+            <h1 class="temp">22°C</h1>
+            <h2 class="city">Kyiv</h2>
+            <div class="details">
+                <div class="col">
+                    <img src="images/humidity.png" alt="">
+                    <div>
+                        <p class="humidity">60%</p>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="images/wind.png" alt="">
+                    <div>
+                        <p class="wind">15 km/h</p>
+                        <p>Wind Speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+
+        async function checkWeather(city) {
+            const response = await fetch(`/weather?city=${encodeURIComponent(city)}`);
+            const data = await response.json();
+
+            if (!data || !data.weather || !data.weather[0]) {
+                document.querySelector(".city").innerHTML = "Not found";
+                document.querySelector(".temp").innerHTML = "--";
+                document.querySelector(".humidity").innerHTML = "--";
+                document.querySelector(".wind").innerHTML = "--";
+                document.querySelector(".weather-icon").src = "images/mist.png";
+                return;
+            }
+
+            document.querySelector(".city").innerHTML = data.name;
+            document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+            document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+            document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+
+            const weatherMain = data.weather[0].main.toLowerCase();
+            const iconMap = {
+                clouds: "clouds.png",
+                clear: "clear.png",
+                rain: "rain.png",
+                drizzle: "drizzle.png",
+                mist: "mist.png",
+                snow: "snow.png"
+            };
+            document.querySelector(".weather-icon").src = "images/" + (iconMap[weatherMain] || "mist.png");
+        }
+
+        searchBtn.addEventListener("click", () => {
+            checkWeather(searchBox.value);
+        });
+        checkWeather("Lviv");
+    </script>
+</body>
+</html>
